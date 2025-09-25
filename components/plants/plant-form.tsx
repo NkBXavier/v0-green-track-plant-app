@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+import { ImageUpload } from "@/components/ui/image-upload"
 import { ArrowLeft, Save } from "lucide-react"
 import Link from "next/link"
 import type { Plant } from "@/lib/types"
@@ -31,7 +31,6 @@ export function PlantForm({ plant, isEditing = false }: PlantFormProps) {
     image_url: plant?.image_url || "",
     water_amount: plant?.water_amount || 250,
     water_frequency: plant?.water_frequency || 7,
-    notes: plant?.notes || "",
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -52,7 +51,6 @@ export function PlantForm({ plant, isEditing = false }: PlantFormProps) {
         user_id: user.id,
         purchase_date: formData.purchase_date || null,
         image_url: formData.image_url || null,
-        notes: formData.notes || null,
       }
 
       if (isEditing && plant) {
@@ -117,28 +115,21 @@ export function PlantForm({ plant, isEditing = false }: PlantFormProps) {
             </div>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="purchase_date">Date d'achat</Label>
-              <Input
-                id="purchase_date"
-                type="date"
-                value={formData.purchase_date}
-                onChange={(e) => handleChange("purchase_date", e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="image_url">URL de l'image</Label>
-              <Input
-                id="image_url"
-                type="url"
-                value={formData.image_url}
-                onChange={(e) => handleChange("image_url", e.target.value)}
-                placeholder="https://exemple.com/image.jpg"
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="purchase_date">Date d'achat</Label>
+            <Input
+              id="purchase_date"
+              type="date"
+              value={formData.purchase_date}
+              onChange={(e) => handleChange("purchase_date", e.target.value)}
+            />
           </div>
+
+          <ImageUpload
+            value={formData.image_url}
+            onChange={(value) => handleChange("image_url", value)}
+            disabled={isLoading}
+          />
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
@@ -164,17 +155,6 @@ export function PlantForm({ plant, isEditing = false }: PlantFormProps) {
                 required
               />
             </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="notes">Notes</Label>
-            <Textarea
-              id="notes"
-              value={formData.notes}
-              onChange={(e) => handleChange("notes", e.target.value)}
-              placeholder="Ajoutez des notes sur votre plante..."
-              rows={3}
-            />
           </div>
 
           {error && <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">{error}</div>}
