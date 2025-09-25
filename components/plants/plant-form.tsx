@@ -4,7 +4,6 @@ import type React from "react"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -27,6 +26,7 @@ export function PlantForm({ plant, isEditing = false }: PlantFormProps) {
   const [formData, setFormData] = useState({
     name: plant?.name || "",
     species: plant?.species || "",
+    location: plant?.location || "",
     purchase_date: plant?.purchase_date || "",
     image_url: plant?.image_url || "",
     water_amount: plant?.water_amount || 250,
@@ -38,32 +38,29 @@ export function PlantForm({ plant, isEditing = false }: PlantFormProps) {
     setIsLoading(true)
     setError(null)
 
-    const supabase = createClient()
-
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (!user) throw new Error("Non authentifié")
+      const url = isEditing && plant ? `/api/plants/${plant.id}` : "/api/plants"
+      const method = isEditing ? "PUT" : "POST"
 
-      const plantData = {
-        ...formData,
-        user_id: user.id,
-        purchase_date: formData.purchase_date || null,
-        image_url: formData.image_url || null,
-      }
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...formData,
+          purchase_date: formData.purchase_date || null,
+          image_url: formData.image_url || null,
+        }),
+      })
 
-      if (isEditing && plant) {
-        const { error } = await supabase.from("plants").update(plantData).eq("id", plant.id).eq("user_id", user.id)
-
-        if (error) throw error
-      } else {
-        const { error } = await supabase.from("plants").insert([plantData])
-
-        if (error) throw error
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Une erreur s'est produite")
       }
 
       router.push("/dashboard")
+      router.refresh()
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "Une erreur s'est produite")
     } finally {
@@ -113,6 +110,16 @@ export function PlantForm({ plant, isEditing = false }: PlantFormProps) {
                 required
               />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="location">Emplacement</Label>
+            <Input
+              id="location"
+              value={formData.location}
+              onChange={(e) => handleChange("location", e.target.value)}
+              placeholder="ex: Salon, près de la fenêtre"
+            />
           </div>
 
           <div className="space-y-2">

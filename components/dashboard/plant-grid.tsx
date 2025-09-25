@@ -1,9 +1,13 @@
+"use client"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Droplets, Calendar, MoreHorizontal, Edit, Trash2 } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import Link from "next/link"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 import type { Plant } from "@/lib/types"
 
 interface PlantGridProps {
@@ -11,6 +15,35 @@ interface PlantGridProps {
 }
 
 export function PlantGrid({ plants }: PlantGridProps) {
+  const router = useRouter()
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+
+  const handleDelete = async (plantId: string, plantName: string) => {
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer "${plantName}" ? Cette action est irréversible.`)) {
+      return
+    }
+
+    setDeletingId(plantId)
+
+    try {
+      const response = await fetch(`/api/plants/${plantId}`, {
+        method: "DELETE",
+      })
+
+      if (!response.ok) {
+        throw new Error("Erreur lors de la suppression")
+      }
+
+      // Refresh the page to update the plant list
+      router.refresh()
+    } catch (error) {
+      console.error("Erreur:", error)
+      alert("Erreur lors de la suppression de la plante")
+    } finally {
+      setDeletingId(null)
+    }
+  }
+
   if (plants.length === 0) {
     return (
       <Card className="text-center py-12">
@@ -81,9 +114,13 @@ export function PlantGrid({ plants }: PlantGridProps) {
                           Modifier
                         </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive">
+                      <DropdownMenuItem
+                        className="text-destructive"
+                        onClick={() => handleDelete(plant.id, plant.name)}
+                        disabled={deletingId === plant.id}
+                      >
                         <Trash2 className="mr-2 h-4 w-4" />
-                        Supprimer
+                        {deletingId === plant.id ? "Suppression..." : "Supprimer"}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -140,10 +177,18 @@ export function PlantGrid({ plants }: PlantGridProps) {
                 </div>
 
                 <div className="flex space-x-2">
-                  <Button asChild size="sm" className="flex-1">
+                  <Button
+                    asChild
+                    size="sm"
+                    className={`flex-1 ${
+                      needsWater
+                        ? "bg-red-600 hover:bg-red-700 text-white"
+                        : "bg-green-600 hover:bg-green-700 text-white"
+                    }`}
+                  >
                     <Link href={`/dashboard/plants/${plant.id}/water`}>
                       <Droplets className="h-4 w-4 mr-2" />
-                      Arroser
+                      {needsWater ? "Arroser maintenant" : "Arroser"}
                     </Link>
                   </Button>
                   <Button asChild variant="outline" size="sm" className="flex-1 bg-transparent">
