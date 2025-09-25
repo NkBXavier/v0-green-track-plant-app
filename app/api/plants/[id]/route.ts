@@ -1,8 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+  const { id } = params
   const supabase = await createClient()
 
   const { data, error } = await supabase.auth.getUser()
@@ -24,8 +24,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   return NextResponse.json(plant)
 }
 
-export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+  const { id } = params
   const supabase = await createClient()
 
   const { data, error } = await supabase.auth.getUser()
@@ -34,14 +34,13 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   }
 
   const body = await request.json()
-  const { name, species, location, water_frequency, water_amount, image_url } = body
+  const { name, species, water_frequency, water_amount, image_url } = body
 
   const { data: plant, error: plantError } = await supabase
     .from("plants")
     .update({
       name,
       species,
-      location,
       water_frequency,
       water_amount,
       image_url,
@@ -59,8 +58,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   return NextResponse.json(plant)
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  const { id } = params
   const supabase = await createClient()
 
   const { data, error } = await supabase.auth.getUser()

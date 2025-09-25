@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json()
-  const { name, species, location, water_frequency, water_amount, image_url } = body
+  const { name, species, water_frequency, water_amount, image_url } = body
 
   // Calculate next watering date
   const nextWatering = new Date()
@@ -43,7 +43,6 @@ export async function POST(request: NextRequest) {
       user_id: data.user.id,
       name,
       species,
-      location,
       water_frequency,
       water_amount,
       image_url,

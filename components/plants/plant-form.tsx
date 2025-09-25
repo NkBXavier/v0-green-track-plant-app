@@ -26,7 +26,6 @@ export function PlantForm({ plant, isEditing = false }: PlantFormProps) {
   const [formData, setFormData] = useState({
     name: plant?.name || "",
     species: plant?.species || "",
-    location: plant?.location || "",
     purchase_date: plant?.purchase_date || "",
     image_url: plant?.image_url || "",
     water_amount: plant?.water_amount || 250,
@@ -110,16 +109,6 @@ export function PlantForm({ plant, isEditing = false }: PlantFormProps) {
                 required
               />
             </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="location">Emplacement</Label>
-            <Input
-              id="location"
-              value={formData.location}
-              onChange={(e) => handleChange("location", e.target.value)}
-              placeholder="ex: Salon, près de la fenêtre"
-            />
           </div>
 
           <div className="space-y-2">
