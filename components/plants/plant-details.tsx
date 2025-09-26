@@ -68,12 +68,6 @@ export function PlantDetails({ plant, wateringHistory }: PlantDetailsProps) {
         </div>
 
         <div className="flex space-x-2">
-          <Button asChild>
-            <Link href={`/dashboard/plants/${plant.id}/water`}>
-              <Droplets className="h-4 w-4 mr-2" />
-              Arroser
-            </Link>
-          </Button>
           <Button asChild variant="outline" className="bg-transparent">
             <Link href={`/dashboard/plants/${plant.id}/edit`}>
               <Edit className="h-4 w-4 mr-2" />
@@ -221,13 +215,6 @@ export function PlantDetails({ plant, wateringHistory }: PlantDetailsProps) {
                   <p className="text-sm text-muted-foreground mt-2">Aucun arrosage programmé</p>
                 </div>
               )}
-
-              <Button asChild className="w-full">
-                <Link href={`/dashboard/plants/${plant.id}/water`}>
-                  <Droplets className="h-4 w-4 mr-2" />
-                  Arroser maintenant
-                </Link>
-              </Button>
             </CardContent>
           </Card>
 
