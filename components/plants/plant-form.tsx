@@ -37,6 +37,19 @@ export function PlantForm({ plant, isEditing = false }: PlantFormProps) {
     setIsLoading(true)
     setError(null)
 
+    if (
+      !formData.name.trim() ||
+      !formData.species.trim() ||
+      !formData.water_amount ||
+      !formData.water_frequency ||
+      !formData.purchase_date.trim() ||
+      !formData.image_url.trim()
+    ) {
+      setError("Tous les champs marqués d'un * sont obligatoires")
+      setIsLoading(false)
+      return
+    }
+
     try {
       const url = isEditing && plant ? `/api/plants/${plant.id}` : "/api/plants"
       const method = isEditing ? "PUT" : "POST"
@@ -112,20 +125,24 @@ export function PlantForm({ plant, isEditing = false }: PlantFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="purchase_date">Date d'achat</Label>
+            <Label htmlFor="purchase_date">Date d'achat *</Label>
             <Input
               id="purchase_date"
               type="date"
               value={formData.purchase_date}
               onChange={(e) => handleChange("purchase_date", e.target.value)}
+              required
             />
           </div>
 
-          <ImageUpload
-            value={formData.image_url}
-            onChange={(value) => handleChange("image_url", value)}
-            disabled={isLoading}
-          />
+          <div className="space-y-2">
+            <ImageUpload
+              value={formData.image_url}
+              onChange={(value) => handleChange("image_url", value)}
+              disabled={isLoading}
+              required={true}
+            />
+          </div>
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">

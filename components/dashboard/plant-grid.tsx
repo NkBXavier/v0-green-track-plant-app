@@ -17,6 +17,7 @@ interface PlantGridProps {
 export function PlantGrid({ plants }: PlantGridProps) {
   const router = useRouter()
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [wateringId, setWateringId] = useState<string | null>(null)
 
   const handleDelete = async (plantId: string, plantName: string) => {
     if (!confirm(`Êtes-vous sûr de vouloir supprimer "${plantName}" ? Cette action est irréversible.`)) {
@@ -41,6 +42,28 @@ export function PlantGrid({ plants }: PlantGridProps) {
       alert("Erreur lors de la suppression de la plante")
     } finally {
       setDeletingId(null)
+    }
+  }
+
+  const handleWater = async (plantId: string) => {
+    setWateringId(plantId)
+
+    try {
+      const response = await fetch(`/api/plants/${plantId}/water`, {
+        method: "POST",
+      })
+
+      if (!response.ok) {
+        throw new Error("Erreur lors de l'arrosage")
+      }
+
+      // Refresh the page to update the plant status
+      router.refresh()
+    } catch (error) {
+      console.error("Erreur:", error)
+      alert("Erreur lors de l'enregistrement de l'arrosage")
+    } finally {
+      setWateringId(null)
     }
   }
 
@@ -178,18 +201,17 @@ export function PlantGrid({ plants }: PlantGridProps) {
 
                 <div className="flex space-x-2">
                   <Button
-                    asChild
                     size="sm"
+                    onClick={() => handleWater(plant.id)}
+                    disabled={wateringId === plant.id}
                     className={`flex-1 ${
                       needsWater
                         ? "bg-red-600 hover:bg-red-700 text-white"
                         : "bg-green-600 hover:bg-green-700 text-white"
                     }`}
                   >
-                    <Link href={`/dashboard/plants/${plant.id}/water`}>
-                      <Droplets className="h-4 w-4 mr-2" />
-                      {needsWater ? "Arroser maintenant" : "Arroser"}
-                    </Link>
+                    <Droplets className="h-4 w-4 mr-2" />
+                    {wateringId === plant.id ? "Arrosage..." : needsWater ? "Arroser maintenant" : "Arroser"}
                   </Button>
                   <Button asChild variant="outline" size="sm" className="flex-1 bg-transparent">
                     <Link href={`/dashboard/plants/${plant.id}`}>

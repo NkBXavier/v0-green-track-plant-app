@@ -12,9 +12,10 @@ interface ImageUploadProps {
   value?: string
   onChange: (value: string) => void
   disabled?: boolean
+  required?: boolean
 }
 
-export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
+export function ImageUpload({ value, onChange, disabled, required }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -61,7 +62,7 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
 
   return (
     <div className="space-y-4">
-      <Label>Image de la plante</Label>
+      <Label>Image de la plante{required && " *"}</Label>
 
       {value ? (
         <div className="relative">
@@ -81,12 +82,15 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
         </div>
       ) : (
         <div
-          className="w-full h-48 rounded-lg border-2 border-dashed border-border hover:border-primary/50 transition-colors cursor-pointer flex flex-col items-center justify-center text-muted-foreground hover:text-primary"
+          className={`w-full h-48 rounded-lg border-2 border-dashed transition-colors cursor-pointer flex flex-col items-center justify-center text-muted-foreground hover:text-primary ${
+            required && !value ? "border-red-300 hover:border-red-400" : "border-border hover:border-primary/50"
+          }`}
           onClick={handleClick}
         >
           <ImageIcon className="h-12 w-12 mb-4" />
           <p className="text-sm font-medium mb-2">Cliquez pour ajouter une image</p>
           <p className="text-xs">PNG, JPG, JPEG jusqu'à 5MB</p>
+          {required && <p className="text-xs text-red-500 mt-1">Image obligatoire</p>}
         </div>
       )}
 
@@ -97,6 +101,7 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
         onChange={handleFileSelect}
         className="hidden"
         disabled={disabled || isUploading}
+        required={required}
       />
 
       {!value && (
